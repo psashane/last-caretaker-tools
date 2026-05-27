@@ -1,0 +1,19 @@
+{
+  "description": "Committees are groups of 4 specific profession roles that must all be filled. Each committee slot requires a distinct profession type. Committees drive the late-game goal — you need to grow one human of each role per committee.",
+  "notes": "Committee data is incomplete — only one example committee has been captured so far. More should be added as discovered in-game.",
+  "committees": [
+    {
+      "name": "Transit & Distribution",
+      "description": "Owns the arteries of orbit: lift schedules, cargo paths, docking flows, and who gets what where without chaos.",
+      "tier": 1,
+      "value": 10.9,
+      "min_age": 18,
+      "members": [
+        { "profession": "Systems Engineer", "status": "filled", "human_name": "Caius R. Arden Sinclair" },
+        { "profession": "Distributor",      "status": "empty" },
+        { "profession": "Growth Specialist","status": "empty" },
+        { "profession": "Guard",            "status": "empty" }
+      ]
+    }
+  ]
+}

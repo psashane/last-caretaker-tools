@@ -1,0 +1,95 @@
+{
+  "description": "All 40 professions grouped by category, each with tier (1-4) and minimum stat requirements. The game picks from all qualifying professions, favoring the highest tier match per category. Physical stats come from food only; mental traits come from memory items only.",
+  "categories": [
+    {
+      "name": "Engineering",
+      "jobs": [
+        { "name": "Maintenance Engineer", "tier": 1, "requirements": { "Strength": 71, "Discipline": 5,  "Focus": 4,   "Logic": 3   } },
+        { "name": "Systems Engineer",     "tier": 2, "requirements": { "Strength": 70, "Discipline": 10, "Focus": 10,  "Logic": 10  } },
+        { "name": "Energy Engineer",      "tier": 3, "requirements": { "Strength": 120,"Discipline": 30, "Focus": 30,  "Logic": 30  } },
+        { "name": "Quantum Engineer",     "tier": 4, "requirements": { "Strength": 181,"Discipline": 61, "Focus": 80,  "Logic": 80  } }
+      ]
+    },
+    {
+      "name": "Arts & Culture",
+      "jobs": [
+        { "name": "Visual Technician",        "tier": 1, "requirements": { "Life Expectancy": 50,  "Creativity": 5,   "Communication": 4,  "Patience": 3  } },
+        { "name": "Sculptor",                 "tier": 2, "requirements": { "Life Expectancy": 80,  "Creativity": 20,  "Communication": 10, "Patience": 15 } },
+        { "name": "Cultural Archivist",       "tier": 3, "requirements": { "Life Expectancy": 140, "Creativity": 45,  "Communication": 35, "Patience": 40 } },
+        { "name": "Existential Expressionist","tier": 4, "requirements": { "Life Expectancy": 200, "Creativity": 120, "Communication": 60, "Patience": 80 } }
+      ]
+    },
+    {
+      "name": "Educators",
+      "jobs": [
+        { "name": "Manual Holder",        "tier": 1, "requirements": { "Weight": 40, "Height": 100, "Communication": 5,   "Patience": 10, "Wisdom": 10  } },
+        { "name": "Teacher",              "tier": 2, "requirements": { "Weight": 60, "Height": 160, "Communication": 15,  "Patience": 15, "Wisdom": 10  } },
+        { "name": "Professor",            "tier": 3, "requirements": { "Weight": 90, "Height": 180, "Communication": 20,  "Patience": 30, "Wisdom": 60  } },
+        { "name": "Existential Chancellor","tier": 4, "requirements": { "Weight": 48, "Height": 200, "Communication": 100, "Patience": 80, "Wisdom": 120 } }
+      ]
+    },
+    {
+      "name": "Agriculture",
+      "jobs": [
+        { "name": "Nutrient Handler",    "tier": 1, "requirements": { "Height": 160, "Life Expectancy": 50,  "Creativity": 5,  "Focus": 5,  "Patience": 5  } },
+        { "name": "Growth Specialist",   "tier": 2, "requirements": { "Height": 180, "Life Expectancy": 60,  "Creativity": 20, "Focus": 10, "Patience": 15 } },
+        { "name": "Biosphere Director",  "tier": 3, "requirements": { "Height": 190, "Life Expectancy": 120, "Creativity": 35, "Focus": 30, "Patience": 40 } },
+        { "name": "Sustenance Architect","tier": 4, "requirements": { "Height": 200, "Life Expectancy": 180, "Creativity": 50, "Focus": 50, "Patience": 50 } }
+      ]
+    },
+    {
+      "name": "Logistics",
+      "jobs": [
+        { "name": "Basic Supplier",        "tier": 1, "requirements": { "Height": 100, "Discipline": 3,  "Focus": 4,   "Logic": 2   } },
+        { "name": "Distributor",           "tier": 2, "requirements": { "Height": 160, "Discipline": 12, "Focus": 15,  "Logic": 10  } },
+        { "name": "Resource Director",     "tier": 3, "requirements": { "Height": 190, "Discipline": 35, "Focus": 40,  "Logic": 30  } },
+        { "name": "Logistics High Command","tier": 4, "requirements": { "Height": 220, "Discipline": 82, "Focus": 100, "Logic": 120 } }
+      ]
+    },
+    {
+      "name": "Military",
+      "jobs": [
+        { "name": "Door Jammer",          "tier": 1, "requirements": { "Strength": 60,  "Discipline": 2,   "Focus": 2,   "Leadership": 5  } },
+        { "name": "Guard",                "tier": 2, "requirements": { "Strength": 120, "Discipline": 15,  "Focus": 12,  "Leadership": 10 } },
+        { "name": "Station Protector",    "tier": 3, "requirements": { "Height": 180,   "Strength": 130,   "Discipline": 40, "Focus": 35, "Leadership": 30 } },
+        { "name": "Guardian of Humanity", "tier": 4, "requirements": { "Height": 200,   "Strength": 200,   "Discipline": 100,"Focus": 120,"Leadership": 80 } }
+      ]
+    },
+    {
+      "name": "Science",
+      "jobs": [
+        { "name": "Lab Technician",          "tier": 1, "requirements": { "Intellect": 80,  "Logic": 5,   "Patience": 5,  "Wisdom": 3   } },
+        { "name": "Field Research Scientist","tier": 2, "requirements": { "Intellect": 110, "Logic": 9,   "Patience": 10, "Wisdom": 9   } },
+        { "name": "Theoretical Scientist",   "tier": 3, "requirements": { "Intellect": 170, "Logic": 25,  "Patience": 30, "Wisdom": 40  } },
+        { "name": "Quantum Physicist",       "tier": 4, "requirements": { "Intellect": 221, "Logic": 120, "Patience": 80, "Wisdom": 100 } }
+      ]
+    },
+    {
+      "name": "Healthcare",
+      "jobs": [
+        { "name": "Health Assistant", "tier": 1, "requirements": { "Weight": 50,  "Empathy": 5,   "Patience": 5,  "Wisdom": 3   } },
+        { "name": "Doctor",           "tier": 2, "requirements": { "Weight": 80,  "Empathy": 15,  "Patience": 12, "Wisdom": 10  } },
+        { "name": "Neuro Specialist",  "tier": 3, "requirements": { "Weight": 120, "Empathy": 40,  "Patience": 35, "Wisdom": 30  } },
+        { "name": "Neural Architect",  "tier": 4, "requirements": { "Weight": 200, "Empathy": 100, "Patience": 80, "Wisdom": 120 } }
+      ]
+    },
+    {
+      "name": "Leadership",
+      "jobs": [
+        { "name": "Room Supervisor",       "tier": 1, "requirements": { "Life Expectancy": 40,  "Communication": 4,   "Empathy": 3,  "Leadership": 5   } },
+        { "name": "Station Quartermaster", "tier": 2, "requirements": { "Life Expectancy": 70,  "Communication": 10,  "Empathy": 10, "Leadership": 15  } },
+        { "name": "Settlement Governor",   "tier": 3, "requirements": { "Life Expectancy": 100, "Communication": 35,  "Empathy": 30, "Leadership": 40  } },
+        { "name": "Colonel of Humanity",   "tier": 4, "requirements": { "Life Expectancy": 220, "Communication": 100, "Empathy": 80, "Leadership": 120 } }
+      ]
+    },
+    {
+      "name": "Explorer",
+      "jobs": [
+        { "name": "Station Roamer",   "tier": 1, "requirements": { "Life Expectancy": 20,  "Strength": 60,  "Adaptability": 1,   "Creativity": 2,  "Focus": 5   } },
+        { "name": "Star Analyzer",    "tier": 2, "requirements": { "Life Expectancy": 60,  "Strength": 100, "Adaptability": 15,  "Creativity": 20, "Focus": 10  } },
+        { "name": "Mission Seeker",   "tier": 3, "requirements": { "Life Expectancy": 90,  "Strength": 100, "Adaptability": 40,  "Creativity": 36, "Focus": 30  } },
+        { "name": "Frontier Explorer","tier": 4, "requirements": { "Life Expectancy": 140, "Strength": 120, "Adaptability": 100, "Creativity": 80, "Focus": 120 } }
+      ]
+    }
+  ]
+}

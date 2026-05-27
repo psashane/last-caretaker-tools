@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Last Caretaker — Inventory Calculator</title>
+<style>
+  :root {
+    --bg: #1a1a2e; --bg2: #16213e; --bg3: #0f3460;
+    --text: #e0e0e0; --text2: #a0a0b0; --text3: #606070;
+    --border: #2a2a4a; --border2: #3a3a5a;
+    --green: #5BAD5B; --red: #C05050; --accent: #4a9eff;
+    --emp: #F5C4B3; --emp-t: #712B13;
+    --com: #B5D4F4; --com-t: #0C447C;
+    --pat: #C0DD97; --pat-t: #27500A;
+    --dis: #FAC775; --dis-t: #633806;
+    --lea: #CED1F7; --lea-t: #3C3489;
+    --ada: #9FE1CB; --ada-t: #085041;
+    --cre: #F4C0D1; --cre-t: #72243E;
+    --foc: #D3D1C7; --foc-t: #444441;
+    --log: #F7C1C1; --log-t: #791F1F;
+    --wis: #F0E6FB; --wis-t: #3C3489;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { color: var(--text2); font-size: 13px; margin-bottom: 20px; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab { padding: 7px 16px; border-radius: 6px; cursor: pointer; background: transparent; border: 1px solid var(--border2); color: var(--text2); font-size: 13px; font-weight: 500; }
+  .tab.on { background: var(--bg3); color: var(--text); border-color: var(--accent); }
+  .panel { display: none; } .panel.on { display: block; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 20px; }
+  .stat-card { background: var(--bg2); border-radius: 8px; padding: 10px 13px; border: 1px solid var(--border); }
+  .stat-label { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px; }
+  .stat-value { font-size: 22px; font-weight: 600; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin: 5px 0; }
+  .bar-label { font-size: 12px; color: var(--text2); width: 105px; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+  .bar-num { font-size: 12px; font-weight: 600; min-width: 38px; text-align: right; }
+  .section-label { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .06em; margin: 20px 0 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .04em; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  th.r { text-align: right; }
+  td { padding: 7px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+  .qty { width: 54px; text-align: center; font-size: 13px; padding: 4px 5px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 4px; color: var(--text); }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin: 2px 2px 0 0; font-weight: 500; }
+  .b-emp{background:var(--emp);color:var(--emp-t)} .b-com{background:var(--com);color:var(--com-t)}
+  .b-pat{background:var(--pat);color:var(--pat-t)} .b-dis{background:var(--dis);color:var(--dis-t)}
+  .b-lea{background:var(--lea);color:var(--lea-t)} .b-ada{background:var(--ada);color:var(--ada-t)}
+  .b-cre{background:var(--cre);color:var(--cre-t)} .b-foc{background:var(--foc);color:var(--foc-t)}
+  .b-log{background:var(--log);color:var(--log-t)} .b-wis{background:var(--wis);color:var(--wis-t)}
+  .phys-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-bottom: 20px; }
+  .phys-card { background: var(--bg2); border-radius: 8px; padding: 10px 13px; border: 1px solid var(--border); }
+  .phys-label { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px; }
+  .phys-value { font-size: 22px; font-weight: 600; }
+  .phys-min { font-size: 10px; color: var(--text3); margin-top: 2px; }
+  .ok { color: var(--green); } .bad { color: var(--red); }
+  .cat-block { margin-bottom: 16px; }
+  .cat-title { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+  .job-row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 6px; margin-bottom: 3px; background: var(--bg2); border: 1px solid var(--border); }
+  .job-row.fail { opacity: .4; }
+  .tier { font-size: 10px; padding: 2px 7px; border-radius: 3px; font-weight: 700; letter-spacing: .03em; flex-shrink: 0; }
+  .t1{background:#1a2e1a;color:#6DBE6D} .t2{background:#1a2040;color:#6DA8DB}
+  .t3{background:#2e1a2e;color:#C87ACC} .t4{background:#2e2810;color:#D4AA4A}
+  .job-name { font-size: 13px; font-weight: 500; flex: 1; }
+  .job-ok { color: var(--green); font-size: 15px; }
+  .job-miss { font-size: 11px; color: var(--red); text-align: right; }
+  .qualify-count { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+  .note { font-size: 12px; color: var(--text3); margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .prof-filter { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; }
+  .prof-filter label { font-size: 13px; color: var(--text2); }
+  .prof-filter input { accent-color: var(--accent); }
+  .dash { color: var(--text3); }
+
+  /* Recipe tab */
+  .recipe-ctrl { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .recipe-select { padding: 8px 12px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-size: 14px; min-width: 240px; }
+  .recipe-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media (max-width: 640px) { .recipe-cols { grid-template-columns: 1fr; } }
+  .rcrd { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  .rcrd-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text2); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: baseline; }
+  .rcrd-count { font-size: 20px; font-weight: 700; color: var(--accent); }
+  .ritem { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .ritem:last-child { border-bottom: none; }
+  .rqty { font-weight: 700; color: var(--accent); min-width: 30px; }
+  .rname { flex: 1; }
+  .rinv { font-size: 11px; min-width: 60px; text-align: right; }
+  .inv-ok { color: var(--green); }
+  .inv-short { color: var(--red); }
+  .rtot { font-size: 12px; color: var(--text2); margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); }
+  .qcrd { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; }
+  .qrow { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; }
+  .q-ok { color: var(--green); font-weight: 600; }
+  .q-hi { color: #C87ACC; }
+  .q-warn { color: #D4AA4A; }
+  .q-note { font-size: 11px; opacity: .7; margin-left: 4px; }
+  .all40-summary { font-size: 13px; margin-bottom: 12px; line-height: 1.7; }
+  .sf-row { display: flex; gap: 10px; padding: 5px 10px; background: rgba(192,80,80,.08); border: 1px solid rgba(192,80,80,.2); border-radius: 5px; margin-bottom: 4px; font-size: 13px; align-items: center; }
+  .sf-name { flex: 1; }
+  .sf-n { color: var(--red); font-weight: 600; min-width: 40px; text-align: right; }
+  .sf-h { color: var(--text2); min-width: 40px; text-align: right; }
+  .sf-s { color: var(--red); min-width: 40px; text-align: right; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>The Last Caretaker — Inventory Calculator</h1>
+  <p class="subtitle">All trait and profession data verified against the official wiki. Edit quantities to update totals live.</p>
+
+  <div class="tabs">
+    <button class="tab on" onclick="switchTab(event,'mental')">Mental Traits</button>
+    <button class="tab" onclick="switchTab(event,'physical')">Physical Stats</button>
+    <button class="tab" onclick="switchTab(event,'professions')">Professions</button>
+    <button class="tab" onclick="switchTab(event,'recipe')">Recipe</button>
+  </div>
+
+  <div id="p-mental" class="panel on">
+    <div class="stat-grid" id="mental-cards"></div>
+    <div id="mental-bars"></div>
+    <p class="section-label">Memory Items</p>
+    <table>
+      <thead><tr><th>Item</th><th>Traits per item</th><th class="r">Qty</th><th class="r">Contribution</th></tr></thead>
+      <tbody id="memory-rows"></tbody>
+    </table>
+  </div>
+
+  <div id="p-physical" class="panel">
+    <div class="phys-grid" id="phys-cards"></div>
+    <p class="section-label">Food Items</p>
+    <table>
+      <thead><tr><th>Food</th><th>H / W / LE / S / I per item</th><th class="r">Qty</th><th class="r">Contribution</th></tr></thead>
+      <tbody id="food-rows"></tbody>
+    </table>
+  </div>
+
+  <div id="p-professions" class="panel">
+    <div class="prof-filter">
+      <input type="checkbox" id="hide-fail" onchange="renderProfessions()">
+      <label for="hide-fail">Show qualifying only</label>
+    </div>
+    <div class="qualify-count" id="qual-count"></div>
+    <div id="prof-list"></div>
+  </div>
+
+  <div id="p-recipe" class="panel">
+    <div class="recipe-ctrl">
+      <label style="font-size:13px;color:var(--text2)">Target profession:</label>
+      <select id="recipe-target" class="recipe-select" onchange="renderRecipe()">
+        <option value="">— select profession —</option>
+      </select>
+    </div>
+    <div id="recipe-output"></div>
+    <p class="section-label" style="margin-top:24px">All-40 Inventory Check</p>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Minimum memory items to grow all 40 professions once each (independent recipes), summed against your current inventory.</p>
+    <div id="all40-output"></div>
+  </div>
+
+  <p class="note">Memory items are finite — optimize recipes to use the minimum needed. Food is unlimited — craft as much as required. The game picks the highest qualifying tier per profession category.</p>
+</div>
+
+<script>
+const TRAITS = ['Empathy','Communication','Patience','Discipline','Leadership','Adaptability','Creativity','Focus','Logic','Wisdom'];
+const BCLS   = ['b-emp','b-com','b-pat','b-dis','b-lea','b-ada','b-cre','b-foc','b-log','b-wis'];
+const COLORS  = ['#D85A30','#378ADD','#639922','#BA7517','#534AB7','#1D9E75','#D4537E','#5F5E5A','#E24B4A','#7F77DD'];
+const PHYS   = ['Height','Weight','Life Expectancy','Strength','Intellect'];
+const PMINS  = [30, 20, 10, 0, 0];
+
+const MEMORIES = [
+  {n:'Ash Notebook',        t:{Empathy:100,Communication:100,Patience:100,Discipline:100,Leadership:100,Adaptability:100,Creativity:100,Focus:100,Logic:100,Wisdom:100}},
+  {n:'Assembly Instructions',t:{Discipline:2,Logic:8}},
+  {n:'Basketball',          t:{Patience:1}},
+  {n:'Biology Notes',       t:{Wisdom:10}},
+  {n:'Blueprints',          t:{Adaptability:10,Logic:5}},
+  {n:'Bowling Ball',        t:{Patience:1}},
+  {n:'Bowling Pin',         t:{Patience:1}},
+  {n:'Camera',              t:{Communication:5,Creativity:5}},
+  {n:'Cards',               t:{Communication:5,Empathy:5}},
+  {n:'Cognitive Cards',     t:{Adaptability:7,Logic:5,Wisdom:3}},
+  {n:"Commander's Log",     t:{Discipline:7,Leadership:8}},
+  {n:'Compass',             t:{Adaptability:6,Focus:3,Leadership:3}},
+  {n:'Crayon',              t:{Creativity:5,Focus:2}},
+  {n:'Encyclopedia',        t:{Logic:5,Wisdom:10}},
+  {n:'First Aid',           t:{Adaptability:10}},
+  {n:'Guitar',              t:{Communication:3,Creativity:3,Focus:3}},
+  {n:'Love Letters',        t:{Wisdom:10}},
+  {n:'Maps',                t:{Leadership:5,Wisdom:10}},
+  {n:'Meditation',          t:{Focus:5}},
+  {n:'Mirror',              t:{Empathy:5}},
+  {n:'Music Notes',         t:{Communication:4,Creativity:6}},
+  {n:'Mystery Box',         t:{Patience:5}},
+  {n:'Plans',               t:{Communication:8,Discipline:7}},
+  {n:'Programming Manual',  t:{Logic:10}},
+  {n:'Small Human Art',     t:{Empathy:5}},
+  {n:'Small Tree',          t:{Discipline:5,Patience:5}},
+  {n:'Stopwatch',           t:{Patience:5}},
+  {n:'Sudoku Book',         t:{Logic:10}},
+  {n:'Survival Diagrams',   t:{Adaptability:10,Leadership:5}},
+  {n:'Teddy Bear',          t:{Empathy:3}},
+  {n:'The Art of War',      t:{Communication:5,Leadership:10}},
+  {n:'Tommy',               t:{Empathy:3}},
+  {n:'Travel Journal',      t:{Adaptability:10}},
+  {n:"Where's Tommy",       t:{Focus:5,Patience:5}},
+];
+
+const FOODS = [
+  {n:'Bone-Fortify',        s:[8,2,2,14,2]},
+  {n:'Endura-Growth',       s:[2,2,8,2,12]},
+  {n:'High-Fat',            s:[1,8,1,1,1]},
+  {n:'Hyper-Evolution',     s:[30,3,5,3,20]},
+  {n:'Immune Boost',        s:[6,6,6,6,6]},
+  {n:'Mind Surge',          s:[1,1,6,1,6]},
+  {n:'Mitochondrial Surge', s:[20,3,12,28,3]},
+  {n:'Muscle Fortification',s:[2,8,2,15,2]},
+  {n:'Nanite Infusion',     s:[25,3,6,3,25]},
+  {n:'Neuro-Boost',         s:[2,2,10,2,15]},
+  {n:'Nutri-Core',          s:[3,3,3,3,3]},
+  {n:'Physique Fuel',       s:[5,1,1,5,1]},
+  {n:'Ultimate Genesis',    s:[50,10,40,10,50]},
+];
+
+const PROFESSIONS = [
+  {cat:'Engineering', jobs:[
+    {n:'Maintenance Engineer',tier:1,r:{Strength:71,Discipline:5,Focus:4,Logic:3}},
+    {n:'Systems Engineer',    tier:2,r:{Strength:70,Discipline:10,Focus:10,Logic:10}},
+    {n:'Energy Engineer',     tier:3,r:{Strength:120,Discipline:30,Focus:30,Logic:30}},
+    {n:'Quantum Engineer',    tier:4,r:{Strength:181,Discipline:61,Focus:80,Logic:80}},
+  ]},
+  {cat:'Arts & Culture', jobs:[
+    {n:'Visual Technician',        tier:1,r:{'Life Expectancy':50,Creativity:5,Communication:4,Patience:3}},
+    {n:'Sculptor',                 tier:2,r:{'Life Expectancy':80,Creativity:20,Communication:10,Patience:15}},
+    {n:'Cultural Archivist',       tier:3,r:{'Life Expectancy':140,Creativity:45,Communication:35,Patience:40}},
+    {n:'Existential Expressionist',tier:4,r:{'Life Expectancy':200,Creativity:120,Communication:60,Patience:80}},
+  ]},
+  {cat:'Educators', jobs:[
+    {n:'Manual Holder',        tier:1,r:{Weight:40,Height:100,Communication:5,Patience:10,Wisdom:10}},
+    {n:'Teacher',              tier:2,r:{Weight:60,Height:160,Communication:15,Patience:15,Wisdom:10}},
+    {n:'Professor',            tier:3,r:{Weight:90,Height:180,Communication:20,Patience:30,Wisdom:60}},
+    {n:'Existential Chancellor',tier:4,r:{Weight:48,Height:200,Communication:100,Patience:80,Wisdom:120}},
+  ]},
+  {cat:'Agriculture', jobs:[
+    {n:'Nutrient Handler',    tier:1,r:{Height:160,'Life Expectancy':50,Creativity:5,Focus:5,Patience:5}},
+    {n:'Growth Specialist',   tier:2,r:{Height:180,'Life Expectancy':60,Creativity:20,Focus:10,Patience:15}},
+    {n:'Biosphere Director',  tier:3,r:{Height:190,'Life Expectancy':120,Creativity:35,Focus:30,Patience:40}},
+    {n:'Sustenance Architect',tier:4,r:{Height:200,'Life Expectancy':180,Creativity:50,Focus:50,Patience:50}},
+  ]},
+  {cat:'Logistics', jobs:[
+    {n:'Basic Supplier',        tier:1,r:{Height:100,Discipline:3,Focus:4,Logic:2}},
+    {n:'Distributor',           tier:2,r:{Height:160,Discipline:12,Focus:15,Logic:10}},
+    {n:'Resource Director',     tier:3,r:{Height:190,Discipline:35,Focus:40,Logic:30}},
+    {n:'Logistics High Command',tier:4,r:{Height:220,Discipline:82,Focus:100,Logic:120}},
+  ]},
+  {cat:'Military', jobs:[
+    {n:'Door Jammer',         tier:1,r:{Strength:60,Discipline:2,Focus:2,Leadership:5}},
+    {n:'Guard',               tier:2,r:{Strength:120,Discipline:15,Focus:12,Leadership:10}},
+    {n:'Station Protector',   tier:3,r:{Height:180,Strength:130,Discipline:40,Focus:35,Leadership:30}},
+    {n:'Guardian of Humanity',tier:4,r:{Height:200,Strength:200,Discipline:100,Focus:120,Leadership:80}},
+  ]},
+  {cat:'Science', jobs:[
+    {n:'Lab Technician',          tier:1,r:{Intellect:80,Logic:5,Patience:5,Wisdom:3}},
+    {n:'Field Research Scientist',tier:2,r:{Intellect:110,Logic:9,Patience:10,Wisdom:9}},
+    {n:'Theoretical Scientist',   tier:3,r:{Intellect:170,Logic:25,Patience:30,Wisdom:40}},
+    {n:'Quantum Physicist',       tier:4,r:{Intellect:221,Logic:120,Patience:80,Wisdom:100}},
+  ]},
+  {cat:'Healthcare', jobs:[
+    {n:'Health Assistant',tier:1,r:{Weight:50,Empathy:5,Patience:5,Wisdom:3}},
+    {n:'Doctor',          tier:2,r:{Weight:80,Empathy:15,Patience:12,Wisdom:10}},
+    {n:'Neuro Specialist', tier:3,r:{Weight:120,Empathy:40,Patience:35,Wisdom:30}},
+    {n:'Neural Architect', tier:4,r:{Weight:200,Empathy:100,Patience:80,Wisdom:120}},
+  ]},
+  {cat:'Leadership', jobs:[
+    {n:'Room Supervisor',       tier:1,r:{'Life Expectancy':40,Communication:4,Empathy:3,Leadership:5}},
+    {n:'Station Quartermaster', tier:2,r:{'Life Expectancy':70,Communication:10,Empathy:10,Leadership:15}},
+    {n:'Settlement Governor',   tier:3,r:{'Life Expectancy':100,Communication:35,Empathy:30,Leadership:40}},
+    {n:'Colonel of Humanity',   tier:4,r:{'Life Expectancy':220,Communication:100,Empathy:80,Leadership:120}},
+  ]},
+  {cat:'Explorer', jobs:[
+    {n:'Station Roamer',   tier:1,r:{'Life Expectancy':20,Strength:60,Adaptability:1,Creativity:2,Focus:5}},
+    {n:'Star Analyzer',    tier:2,r:{'Life Expectancy':60,Strength:100,Adaptability:15,Creativity:20,Focus:10}},
+    {n:'Mission Seeker',   tier:3,r:{'Life Expectancy':90,Strength:100,Adaptability:40,Creativity:36,Focus:30}},
+    {n:'Frontier Explorer',tier:4,r:{'Life Expectancy':140,Strength:120,Adaptability:100,Creativity:80,Focus:120}},
+  ]},
+];
+
+let mq = {
+  'Ash Notebook':10,'Assembly Instructions':18,'Basketball':23,'Biology Notes':13,
+  'Blueprints':14,'Bowling Ball':7,'Bowling Pin':31,'Camera':15,'Cards':15,
+  'Cognitive Cards':9,"Commander's Log":10,'Compass':19,'Crayon':9,
+  'Encyclopedia':9,'First Aid':10,'Guitar':16,'Love Letters':5,'Maps':15,
+  'Meditation':12,'Mirror':10,'Music Notes':12,'Mystery Box':12,'Plans':10,
+  'Programming Manual':10,'Small Human Art':5,'Small Tree':13,'Stopwatch':14,
+  'Sudoku Book':10,'Survival Diagrams':12,'Teddy Bear':37,'The Art of War':10,
+  'Tommy':16,'Travel Journal':8,"Where's Tommy":13
+};
+let fq = {
+  'Bone-Fortify':0,'Endura-Growth':0,'High-Fat':0,'Hyper-Evolution':0,
+  'Immune Boost':0,'Mind Surge':0,'Mitochondrial Surge':0,'Muscle Fortification':0,
+  'Nanite Infusion':0,'Neuro-Boost':0,'Nutri-Core':0,'Physique Fuel':0,'Ultimate Genesis':0
+};
+
+// ── existing calc functions ──────────────────────────────────────────────────
+
+function mentalTotals() {
+  const t = {}; TRAITS.forEach(k => t[k] = 0);
+  MEMORIES.forEach(m => { const q = mq[m.n]||0; Object.entries(m.t).forEach(([k,v]) => t[k] += v*q); });
+  return t;
+}
+function foodTotals() {
+  const t = [0,0,0,0,0];
+  FOODS.forEach(f => { const q = fq[f.n]||0; f.s.forEach((v,i) => t[i] += v*q); });
+  return t;
+}
+function allStats() {
+  const mt = mentalTotals(), ft = foodTotals(), s = {...mt};
+  s['Height']=ft[0]; s['Weight']=ft[1]; s['Life Expectancy']=ft[2]; s['Strength']=ft[3]; s['Intellect']=ft[4];
+  return s;
+}
+
+function traitBadges(traits, mult) {
+  return TRAITS.filter(k => traits[k]).map(k => {
+    const i = TRAITS.indexOf(k);
+    const v = mult ? traits[k]*mult : traits[k];
+    if (mult && !v) return '';
+    return `<span class="badge ${BCLS[i]}">${k.slice(0,3)} ${v}</span>`;
+  }).join('');
+}
+
+function renderMental() {
+  const t = mentalTotals(), mx = Math.max(...Object.values(t), 1);
+  document.getElementById('mental-cards').innerHTML = TRAITS.map((k,i) =>
+    `<div class="stat-card"><div class="stat-label">${k}</div><div class="stat-value" style="color:${COLORS[i]}">${t[k]}</div></div>`
+  ).join('');
+  document.getElementById('mental-bars').innerHTML = TRAITS.map((k,i) => {
+    const p = Math.min(100, Math.round(t[k]/mx*100));
+    return `<div class="bar-row"><span class="bar-label">${k}</span><div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${COLORS[i]}"></div></div><span class="bar-num" style="color:${COLORS[i]}">${t[k]}</span></div>`;
+  }).join('');
+  document.getElementById('memory-rows').innerHTML = MEMORIES.map(m => {
+    const q = mq[m.n]||0, en = m.n.replace(/'/g,"&#39;"), es = m.n.replace(/'/g,"\\'");
+    const contrib = q ? traitBadges(m.t, q) : '<span class="dash">—</span>';
+    return `<tr><td>${en}</td><td>${traitBadges(m.t)}</td><td style="text-align:right"><input type="number" class="qty" min="0" value="${q}" onchange="updateMem('${es}',this.value)"></td><td style="text-align:right">${contrib}</td></tr>`;
+  }).join('');
+}
+
+function renderPhysical() {
+  const ft = foodTotals();
+  document.getElementById('phys-cards').innerHTML = PHYS.map((s,i) => {
+    const ok = ft[i] >= PMINS[i], cls = PMINS[i] > 0 ? (ok?'ok':'bad') : '';
+    return `<div class="phys-card"><div class="phys-label">${s}</div><div class="phys-value ${cls}">${Math.round(ft[i])}</div>${PMINS[i]>0?`<div class="phys-min">min: ${PMINS[i]} ${ok?'✓':'✗'}</div>`:''}</div>`;
+  }).join('');
+  document.getElementById('food-rows').innerHTML = FOODS.map(f => {
+    const q = fq[f.n]||0;
+    const contrib = q ? f.s.map((v,i) => `<span style="color:var(--text2);font-size:12px">${PHYS[i][0]}:${v*q}</span>`).join(' ') : '<span class="dash">—</span>';
+    return `<tr><td>${f.n}</td><td style="font-size:12px;color:var(--text2)">${f.s.map((v,i)=>PHYS[i][0]+':'+v).join(' ')}</td><td style="text-align:right"><input type="number" class="qty" min="0" value="${q}" onchange="updateFood('${f.n}',this.value)"></td><td style="text-align:right">${contrib}</td></tr>`;
+  }).join('');
+}
+
+function renderProfessions() {
+  const s = allStats(), hideF = document.getElementById('hide-fail').checked;
+  const TCLS = ['t1','t2','t3','t4'];
+  let qual = 0, total = 0, html = '';
+  PROFESSIONS.forEach(cat => {
+    let catHtml = '';
+    cat.jobs.forEach((job, idx) => {
+      total++;
+      const missing = Object.entries(job.r).filter(([k,v]) => (s[k]||0) < v);
+      const ok = missing.length === 0;
+      if (ok) qual++;
+      if (hideF && !ok) return;
+      const right = ok
+        ? `<span class="job-ok">✓</span>`
+        : missing.map(([k,v]) => `<span class="job-miss">${k}: ${s[k]||0}/${v}</span>`).join(' ');
+      catHtml += `<div class="job-row${ok?'':' fail'}"><span class="tier ${TCLS[idx]}">T${idx+1}</span><span class="job-name">${job.n}</span>${right}</div>`;
+    });
+    if (catHtml) html += `<div class="cat-block"><div class="cat-title">${cat.cat}</div>${catHtml}</div>`;
+  });
+  document.getElementById('qual-count').innerHTML = `Qualifying: <span style="color:var(--green)">${qual}</span> / ${total} professions`;
+  document.getElementById('prof-list').innerHTML = html;
+}
+
+function updateMem(n, v) { mq[n] = Math.max(0, parseInt(v)||0); renderMental(); renderProfessions(); renderAll40(); }
+function updateFood(n, v) { fq[n] = Math.max(0, parseInt(v)||0); renderPhysical(); renderProfessions(); }
+function switchTab(ev, id) {
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  ev.target.classList.add('on');
+  document.getElementById('p-'+id).classList.add('on');
+}
+
+// ── recipe optimizer ─────────────────────────────────────────────────────────
+
+// Minimum food items (tries all single-type and all 2-type combos).
+function optimizeFoodRecipe(reqObj) {
+  const reqE = Object.entries(reqObj).filter(([k]) => PHYS.includes(k));
+  if (!reqE.length) return { items: [], totals: [0,0,0,0,0], total: 0 };
+
+  let bestTotal = Infinity, bestItems = null, bestTotals = null;
+
+  function tryCombo(pairs) {
+    const totals = [0,0,0,0,0]; let sum = 0;
+    pairs.forEach(([f,n]) => { if (n>0) { f.s.forEach((v,i) => totals[i]+=v*n); sum+=n; } });
+    if (reqE.every(([s,r]) => totals[PHYS.indexOf(s)] >= r) && sum < bestTotal) {
+      bestTotal = sum;
+      bestItems = pairs.filter(([,n])=>n>0).map(([f,n])=>({n:f.n,q:n}));
+      bestTotals = totals;
+    }
+  }
+
+  // Single food type
+  FOODS.forEach(f => {
+    let n=0, ok=true;
+    reqE.forEach(([s,r]) => { const i=PHYS.indexOf(s); if (!f.s[i]) ok=false; else n=Math.max(n,Math.ceil(r/f.s[i])); });
+    if (ok) tryCombo([[f,n]]);
+  });
+
+  // Two food types
+  for (let ai=0; ai<FOODS.length; ai++) {
+    for (let bi=ai+1; bi<FOODS.length; bi++) {
+      const f1=FOODS[ai], f2=FOODS[bi];
+      const maxN1 = reqE.reduce((m,[s,r]) => { const i=PHYS.indexOf(s); return f1.s[i]?Math.max(m,Math.ceil(r/f1.s[i])):m; }, 0);
+      for (let n1=0; n1<=maxN1; n1++) {
+        let n2=0, ok=true;
+        reqE.forEach(([s,r]) => {
+          const i=PHYS.indexOf(s), rem=r-n1*f1.s[i];
+          if (rem<=0) return;
+          if (!f2.s[i]) ok=false; else n2=Math.max(n2,Math.ceil(rem/f2.s[i]));
+        });
+        if (ok) tryCombo([[f1,n1],[f2,n2]]);
+      }
+    }
+  }
+
+  return bestItems ? {items:bestItems, totals:bestTotals, total:bestTotal}
+                   : {items:[], totals:[0,0,0,0,0], total:0};
+}
+
+// Minimum memory items (greedy: each step picks the item covering the most remaining deficit).
+function optimizeMemoryRecipe(reqObj) {
+  const rem = {};
+  TRAITS.forEach(t => { if (reqObj[t] != null) rem[t] = reqObj[t]; });
+  if (!Object.keys(rem).length) return { items:[], traits:{}, count:0 };
+
+  const recipe = {};
+  for (let i=0; i<500 && Object.values(rem).some(v=>v>0); i++) {
+    let best=null, bestScore=-1;
+    MEMORIES.forEach(m => {
+      const score = TRAITS.reduce((s,k) => s + (rem[k]>0 && m.t[k] ? Math.min(m.t[k],rem[k]) : 0), 0);
+      if (score > bestScore) { bestScore=score; best=m; }
+    });
+    if (!best || bestScore<=0) break;
+    recipe[best.n] = (recipe[best.n]||0)+1;
+    TRAITS.forEach(k => { if (rem[k]>0 && best.t[k]) rem[k]=Math.max(0,rem[k]-best.t[k]); });
+  }
+
+  const traits = {};
+  TRAITS.forEach(k => traits[k]=0);
+  Object.entries(recipe).forEach(([name,qty]) => {
+    const m=MEMORIES.find(x=>x.n===name);
+    if (m) TRAITS.forEach(k => { if (m.t[k]) traits[k]+=m.t[k]*qty; });
+  });
+
+  const items = Object.entries(recipe).map(([n,q])=>({n,q}));
+  return { items, traits, count:items.reduce((s,x)=>s+x.q,0) };
+}
+
+// All qualifying professions given combined memory traits + food totals.
+function qualifyingProfessions(memTraits, foodTotals) {
+  const stats = {...memTraits};
+  PHYS.forEach((s,i) => stats[s]=foodTotals[i]||0);
+  const result=[];
+  PROFESSIONS.forEach(cat => {
+    cat.jobs.forEach(job => {
+      if (Object.entries(job.r).every(([k,v])=>(stats[k]||0)>=v))
+        result.push({...job, cat:cat.cat});
+    });
+  });
+  return result;
+}
+
+// ── recipe render ─────────────────────────────────────────────────────────────
+
+function renderRecipe() {
+  const val = document.getElementById('recipe-target').value;
+  const out = document.getElementById('recipe-output');
+  if (!val) { out.innerHTML=''; return; }
+  const job = JSON.parse(val);
+  const TCLS = ['t1','t2','t3','t4'];
+
+  const food = optimizeFoodRecipe(job.r);
+  const mem  = optimizeMemoryRecipe(job.r);
+  const quals = qualifyingProfessions(mem.traits, food.totals);
+
+  // Determine highest qualifying tier per category for the game-assigns note
+  const highestPerCat = {};
+  quals.forEach(q => {
+    if (!highestPerCat[q.cat] || q.tier > highestPerCat[q.cat].tier) highestPerCat[q.cat] = q;
+  });
+
+  let html = '<div class="recipe-cols">';
+
+  // Food card
+  html += `<div class="rcrd"><div class="rcrd-title"><span>Food Recipe</span><span class="rcrd-count">${food.total} items</span></div>`;
+  if (food.items.length) {
+    food.items.forEach(({n,q}) => {
+      const f=FOODS.find(x=>x.n===n);
+      const contrib = f ? PHYS.map((s,i)=>f.s[i]?`${s[0]}:${f.s[i]*q}`:'').filter(Boolean).join('  ') : '';
+      html += `<div class="ritem"><span class="rqty">${q}×</span><span class="rname">${n}</span><span style="font-size:11px;color:var(--text3)">${contrib}</span></div>`;
+    });
+    const nonzero = PHYS.map((s,i)=>food.totals[i]?`${s}: <b>${food.totals[i]}</b>`:'').filter(Boolean);
+    html += `<div class="rtot">Totals: ${nonzero.join(' &nbsp; ')}</div>`;
+  } else {
+    html += `<div style="font-size:13px;color:var(--text3);padding:4px 0">No physical stat requirements.</div>`;
+  }
+  html += '</div>';
+
+  // Memory card
+  const memShort = mem.items.filter(({n,q})=>q>(mq[n]||0));
+  html += `<div class="rcrd"><div class="rcrd-title"><span>Memory Recipe</span><span class="rcrd-count">${mem.count} items</span></div>`;
+  if (mem.items.length) {
+    mem.items.forEach(({n,q}) => {
+      const m=MEMORIES.find(x=>x.n===n);
+      const have=mq[n]||0, cls=have>=q?'inv-ok':'inv-short';
+      html += `<div class="ritem"><span class="rqty">${q}×</span><span class="rname">${n}</span><span class="rinv ${cls}">have ${have}</span>${m?traitBadges(m.t,q):''}</div>`;
+    });
+    if (memShort.length) {
+      html += `<div class="rtot" style="color:var(--red)">⚠ Short: ${memShort.map(x=>`${x.n} (need ${x.q}, have ${mq[x.n]||0})`).join('; ')}</div>`;
+    } else {
+      html += `<div class="rtot" style="color:var(--green)">✓ Sufficient inventory</div>`;
+    }
+  } else {
+    html += `<div style="font-size:13px;color:var(--text3);padding:4px 0">No mental trait requirements.</div>`;
+  }
+  html += '</div></div>'; // close recipe-cols
+
+  // Qualification check
+  html += `<div class="qcrd"><div class="rcrd-title" style="margin-bottom:8px"><span>Qualification Check</span><span style="font-size:11px;color:var(--text3);font-weight:400">game assigns highest tier per category</span></div>`;
+  if (!quals.find(q=>q.n===job.n)) {
+    html += `<div style="color:var(--red);font-size:13px">⚠ Target profession not qualified — recipe may be incomplete.</div>`;
+  } else {
+    // Group by category
+    const byCat = {};
+    quals.forEach(q => { (byCat[q.cat]=byCat[q.cat]||[]).push(q); });
+    Object.entries(byCat).forEach(([cat, jobs]) => {
+      jobs.sort((a,b)=>b.tier-a.tier);
+      const assigned = jobs[0];
+      jobs.forEach(j => {
+        const isTarget = j.n===job.n;
+        const isAssigned = j.n===assigned.n;
+        let cls='q-warn', prefix='!';
+        if (isTarget && isAssigned) { cls='q-ok'; prefix='✓'; }
+        else if (isTarget) { cls='q-hi'; prefix='↑'; }
+        else if (isAssigned) { cls='q-hi'; prefix='↑'; }
+        const note = isAssigned && !isTarget ? 'game assigns this' : isTarget && !isAssigned ? 'overshot by higher tier' : isTarget ? '' : '';
+        html += `<div class="qrow ${cls}"><span>${prefix}</span><span class="tier ${TCLS[j.tier-1]}">T${j.tier}</span><span>${cat} — ${j.n}</span>${note?`<span class="q-note">(${note})</span>`:''}`;
+        html += `</div>`;
+      });
+    });
+  }
+  html += '</div>';
+
+  out.innerHTML = html;
+}
+
+// ── all-40 check ──────────────────────────────────────────────────────────────
+
+function renderAll40() {
+  const usage = {};
+  MEMORIES.forEach(m => usage[m.n]=0);
+
+  PROFESSIONS.forEach(cat => {
+    cat.jobs.forEach(job => {
+      const mem = optimizeMemoryRecipe(job.r);
+      mem.items.forEach(({n,q}) => usage[n]+=q);
+    });
+  });
+
+  const totalNeeded = Object.values(usage).reduce((a,b)=>a+b,0);
+  const totalHave   = Object.values(mq).reduce((a,b)=>a+b,0);
+
+  const shortfalls = Object.entries(usage)
+    .filter(([n,needed]) => needed>(mq[n]||0))
+    .sort((a,b) => (b[1]-(mq[b[0]]||0))-(a[1]-(mq[a[0]]||0)))
+    .map(([n,needed]) => ({name:n, needed, have:mq[n]||0, short:needed-(mq[n]||0)}));
+
+  const statusColor = shortfalls.length ? 'var(--red)' : 'var(--green)';
+  const statusText  = shortfalls.length ? `⚠ ${shortfalls.length} item type(s) insufficient` : '✓ Sufficient for all 40';
+
+  let html = `<div class="all40-summary">
+    Memory items needed (sum of minimums): <b>${totalNeeded}</b> &nbsp;|&nbsp;
+    Currently have: <b>${totalHave}</b> &nbsp;|&nbsp;
+    <span style="color:${statusColor};font-weight:600">${statusText}</span>
+  </div>`;
+
+  if (shortfalls.length) {
+    html += `<div style="margin-bottom:6px;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Item &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Needed &nbsp; Have &nbsp; Short</div>`;
+    shortfalls.forEach(({name,needed,have,short}) => {
+      html += `<div class="sf-row"><span class="sf-name">${name}</span><span class="sf-n">${needed}</span><span class="sf-h">${have}</span><span class="sf-s">-${short}</span></div>`;
+    });
+  }
+
+  document.getElementById('all40-output').innerHTML = html;
+}
+
+// ── init ──────────────────────────────────────────────────────────────────────
+
+// Populate profession dropdown
+(function() {
+  const sel = document.getElementById('recipe-target');
+  PROFESSIONS.forEach(cat => {
+    const grp = document.createElement('optgroup');
+    grp.label = cat.cat;
+    cat.jobs.forEach(job => {
+      const opt = document.createElement('option');
+      opt.value = JSON.stringify({cat:cat.cat, n:job.n, tier:job.tier, r:job.r});
+      opt.textContent = `T${job.tier} — ${job.n}`;
+      grp.appendChild(opt);
+    });
+    sel.appendChild(grp);
+  });
+})();
+
+renderMental(); renderPhysical(); renderProfessions(); renderAll40();
+</script>
+</body>
+</html>
