@@ -2,19 +2,24 @@
   "description": "All food items and their physical stat values. Food is renewable — crafting ingredients are farmable in unlimited quantities. Physical stats are the only way to influence Height, Weight, Life Expectancy, Strength, and Intellect.",
   "stats": ["Height", "Weight", "Life Expectancy", "Strength", "Intellect"],
   "physical_minimums": { "Height": 30, "Weight": 20, "Life Expectancy": 10 },
+  "ingredient_tiers": {
+    "basic":    ["Fat", "Protein", "Carbohydrate"],
+    "mid":      ["Calcium", "Vitamin D", "Omega-3"],
+    "advanced": ["Nanite Nutrient", "Mitochondrial Amplifier", "Bioregulator"]
+  },
   "items": [
-    { "name": "Bone-Fortify",         "stats": { "Height": 8,  "Weight": 2,  "Life Expectancy": 2,  "Strength": 14, "Intellect": 2  } },
-    { "name": "Endura-Growth",        "stats": { "Height": 2,  "Weight": 2,  "Life Expectancy": 8,  "Strength": 2,  "Intellect": 12 } },
-    { "name": "High-Fat",             "stats": { "Height": 1,  "Weight": 8,  "Life Expectancy": 1,  "Strength": 1,  "Intellect": 1  } },
-    { "name": "Hyper-Evolution",      "stats": { "Height": 30, "Weight": 3,  "Life Expectancy": 5,  "Strength": 3,  "Intellect": 20 } },
-    { "name": "Immune Boost",         "stats": { "Height": 6,  "Weight": 6,  "Life Expectancy": 6,  "Strength": 6,  "Intellect": 6  } },
-    { "name": "Mind Surge",           "stats": { "Height": 1,  "Weight": 1,  "Life Expectancy": 6,  "Strength": 1,  "Intellect": 6  } },
-    { "name": "Mitochondrial Surge",  "stats": { "Height": 20, "Weight": 3,  "Life Expectancy": 12, "Strength": 28, "Intellect": 3  } },
-    { "name": "Muscle Fortification", "stats": { "Height": 2,  "Weight": 8,  "Life Expectancy": 2,  "Strength": 15, "Intellect": 2  } },
-    { "name": "Nanite Infusion",      "stats": { "Height": 25, "Weight": 3,  "Life Expectancy": 6,  "Strength": 3,  "Intellect": 25 } },
-    { "name": "Neuro-Boost",          "stats": { "Height": 2,  "Weight": 2,  "Life Expectancy": 10, "Strength": 2,  "Intellect": 15 } },
-    { "name": "Nutri-Core",           "stats": { "Height": 3,  "Weight": 3,  "Life Expectancy": 3,  "Strength": 3,  "Intellect": 3  } },
-    { "name": "Physique Fuel",        "stats": { "Height": 5,  "Weight": 1,  "Life Expectancy": 1,  "Strength": 5,  "Intellect": 1  } },
-    { "name": "Ultimate Genesis",     "stats": { "Height": 50, "Weight": 10, "Life Expectancy": 40, "Strength": 10, "Intellect": 50 } }
+    { "name": "High-Fat",             "stats": { "Height": 1,  "Weight": 8,  "Life Expectancy": 1,  "Strength": 1,  "Intellect": 1  }, "recipe": { "Fat": 8, "Protein": 5, "Carbohydrate": 5 } },
+    { "name": "Nutri-Core",           "stats": { "Height": 3,  "Weight": 3,  "Life Expectancy": 3,  "Strength": 3,  "Intellect": 3  }, "recipe": { "Fat": 3, "Protein": 3, "Carbohydrate": 3 } },
+    { "name": "Mind Surge",           "stats": { "Height": 1,  "Weight": 1,  "Life Expectancy": 6,  "Strength": 1,  "Intellect": 6  }, "recipe": { "Fat": 2, "Protein": 10, "Carbohydrate": 1 } },
+    { "name": "Physique Fuel",        "stats": { "Height": 5,  "Weight": 1,  "Life Expectancy": 1,  "Strength": 5,  "Intellect": 1  }, "recipe": { "Fat": 2, "Protein": 4, "Carbohydrate": 2 } },
+    { "name": "Muscle Fortification", "stats": { "Height": 2,  "Weight": 8,  "Life Expectancy": 2,  "Strength": 15, "Intellect": 2  }, "recipe": { "Calcium": 1, "Vitamin D": 12, "Omega-3": 2 } },
+    { "name": "Bone-Fortify",         "stats": { "Height": 8,  "Weight": 2,  "Life Expectancy": 2,  "Strength": 14, "Intellect": 2  }, "recipe": { "Calcium": 10, "Vitamin D": 3, "Omega-3": 2 } },
+    { "name": "Endura-Growth",        "stats": { "Height": 2,  "Weight": 2,  "Life Expectancy": 8,  "Strength": 2,  "Intellect": 12 }, "recipe": { "Calcium": 3, "Vitamin D": 4, "Omega-3": 4 } },
+    { "name": "Immune Boost",         "stats": { "Height": 6,  "Weight": 6,  "Life Expectancy": 6,  "Strength": 6,  "Intellect": 6  }, "recipe": { "Fat": 1, "Protein": 2, "Carbohydrate": 3, "Calcium": 3, "Vitamin D": 3, "Omega-3": 3 } },
+    { "name": "Neuro-Boost",          "stats": { "Height": 2,  "Weight": 2,  "Life Expectancy": 10, "Strength": 2,  "Intellect": 15 }, "recipe": { "Calcium": 3, "Vitamin D": 3, "Omega-3": 10 } },
+    { "name": "Mitochondrial Surge",  "stats": { "Height": 20, "Weight": 3,  "Life Expectancy": 12, "Strength": 28, "Intellect": 3  }, "recipe": { "Nanite Nutrient": 2, "Mitochondrial Amplifier": 2, "Bioregulator": 2 } },
+    { "name": "Hyper-Evolution",      "stats": { "Height": 30, "Weight": 3,  "Life Expectancy": 5,  "Strength": 3,  "Intellect": 20 }, "recipe": { "Nanite Nutrient": 3, "Mitochondrial Amplifier": 1, "Bioregulator": 1 } },
+    { "name": "Nanite Infusion",      "stats": { "Height": 25, "Weight": 3,  "Life Expectancy": 6,  "Strength": 3,  "Intellect": 25 }, "recipe": { "Fat": 1, "Calcium": 1, "Nanite Nutrient": 4 } },
+    { "name": "Ultimate Genesis",     "stats": { "Height": 50, "Weight": 10, "Life Expectancy": 40, "Strength": 10, "Intellect": 50 }, "recipe": { "Nanite Nutrient": 1, "Mitochondrial Amplifier": 5, "Bioregulator": 1 } }
   ]
 }

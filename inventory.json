@@ -1,6 +1,6 @@
 {
   "description": "Shane's current in-game memory item inventory. Quantities represent items available in storage. Memory items are a finite resource — they are consumed when used to grow a human and cannot be farmed infinitely, so minimizing usage per human is a key optimization goal.",
-  "last_updated": "2026-05-26",
+  "last_updated": "2026-05-27",
   "items": [
     { "name": "Ash Notebook",           "quantity": 10 },
     { "name": "Assembly Instructions",  "quantity": 18 },
@@ -12,7 +12,7 @@
     { "name": "Camera",                 "quantity": 15 },
     { "name": "Cards",                  "quantity": 15 },
     { "name": "Cognitive Cards",        "quantity": 9  },
-    { "name": "Commander's Log",        "quantity": 10 },
+    { "name": "Commander's Log",        "quantity": 8  },
     { "name": "Compass",                "quantity": 19 },
     { "name": "Crayon",                 "quantity": 9  },
     { "name": "Encyclopedia",           "quantity": 9  },
@@ -24,17 +24,17 @@
     { "name": "Mirror",                 "quantity": 10 },
     { "name": "Music Notes",            "quantity": 12 },
     { "name": "Mystery Box",            "quantity": 12 },
-    { "name": "Plans",                  "quantity": 10 },
+    { "name": "Plans",                  "quantity": 9  },
     { "name": "Programming Manual",     "quantity": 10 },
     { "name": "Small Human Art",        "quantity": 5  },
     { "name": "Small Tree",             "quantity": 13 },
     { "name": "Stopwatch",              "quantity": 14 },
     { "name": "Sudoku Book",            "quantity": 10 },
-    { "name": "Survival Diagrams",      "quantity": 12 },
+    { "name": "Survival Diagrams",      "quantity": 10 },
     { "name": "Teddy Bear",             "quantity": 37 },
     { "name": "The Art of War",         "quantity": 10 },
     { "name": "Tommy",                  "quantity": 16 },
     { "name": "Travel Journal",         "quantity": 8  },
-    { "name": "Where's Tommy",          "quantity": 13 }
+    { "name": "Where's Tommy",          "quantity": 10 }
   ]
 }

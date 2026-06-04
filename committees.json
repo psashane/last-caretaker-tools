@@ -1,18 +1,67 @@
 {
   "description": "Committees are groups of 4 specific profession roles that must all be filled. Each committee slot requires a distinct profession type. Committees drive the late-game goal — you need to grow one human of each role per committee.",
-  "notes": "Committee data is incomplete — only one example committee has been captured so far. More should be added as discovered in-game.",
+  "notes": "mem_recipe: minimum memory items (contamination-safe). food_recipe: minimum food items. override_reason: why the recipe differs from the naive optimizer output.",
   "committees": [
     {
       "name": "Transit & Distribution",
-      "description": "Owns the arteries of orbit: lift schedules, cargo paths, docking flows, and who gets what where without chaos.",
+      "description": "Owns the arteries of orbit: lift schedules, cargo paths, docking flows, and who gets what where without chaos. It decides routing priorities (medical vs food vs parts), congestion rules, escort requirements, and how tightly distribution is locked down during unrest. In lore terms: this is where 'fairness vs efficiency' becomes a timetable and a locked container.",
       "tier": 1,
       "value": 10.9,
       "min_age": 18,
       "members": [
-        { "profession": "Systems Engineer", "status": "filled", "human_name": "Caius R. Arden Sinclair" },
-        { "profession": "Distributor",      "status": "empty" },
-        { "profession": "Growth Specialist","status": "empty" },
-        { "profession": "Guard",            "status": "empty" }
+        {
+          "profession": "Systems Engineer",
+          "status": "filled",
+          "human_name": "Caius R. Arden Sinclair"
+        },
+        {
+          "profession": "Distributor",
+          "status": "empty",
+          "requirements": { "Height": 160, "Discipline": 12, "Focus": 15, "Logic": 10 },
+          "mem_recipe": [
+            { "item": "Sudoku Book",   "qty": 1 },
+            { "item": "Plans",         "qty": 2 },
+            { "item": "Where's Tommy", "qty": 3 }
+          ],
+          "mem_total": 6,
+          "food_recipe": [
+            { "item": "Ultimate Genesis", "qty": 4 }
+          ],
+          "food_total": 4,
+          "contamination": "none — Intellect:200 from food but Wisdom:0 blocks Lab Technician"
+        },
+        {
+          "profession": "Growth Specialist",
+          "status": "empty",
+          "requirements": { "Height": 180, "Life Expectancy": 60, "Creativity": 20, "Focus": 10, "Patience": 15 },
+          "mem_recipe": [
+            { "item": "Crayon",        "qty": 4 },
+            { "item": "Where's Tommy", "qty": 3 }
+          ],
+          "mem_total": 7,
+          "food_recipe": [
+            { "item": "Ultimate Genesis", "qty": 4 }
+          ],
+          "food_total": 4,
+          "override_reason": "Crayon used instead of Music Notes. Music Notes adds Communication:4/item; 4 items gives Comm:16 which — combined with food Life Expectancy:160 — qualifies for Sculptor T2 (Arts & Culture), risking wrong profession assignment.",
+          "contamination": "none with Crayon — no Communication generated, Arts & Culture not triggered"
+        },
+        {
+          "profession": "Guard",
+          "status": "empty",
+          "requirements": { "Strength": 120, "Discipline": 15, "Focus": 12, "Leadership": 10 },
+          "mem_recipe": [
+            { "item": "Commander's Log", "qty": 2 },
+            { "item": "Plans",           "qty": 1 },
+            { "item": "Where's Tommy",   "qty": 3 }
+          ],
+          "mem_total": 6,
+          "food_recipe": [
+            { "item": "Mitochondrial Surge", "qty": 5 }
+          ],
+          "food_total": 5,
+          "contamination": "none — Intellect:15 from food stays well below Lab Technician threshold"
+        }
       ]
     }
   ]

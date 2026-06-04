@@ -76,6 +76,16 @@
   .prof-filter input { accent-color: var(--accent); }
   .dash { color: var(--text3); }
 
+  /* Committee tab */
+  .comm-name { font-size: 16px; font-weight: 600; margin-bottom: 3px; }
+  .comm-meta { font-size: 12px; color: var(--text2); margin-bottom: 18px; }
+  .slot-filled { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(91,173,91,.08); border: 1px solid rgba(91,173,91,.25); border-radius: 6px; margin-bottom: 10px; font-size: 13px; }
+  .slot-empty { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; }
+  .slot-hdr { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .slot-title { font-size: 14px; font-weight: 600; flex: 1; }
+  .override-note { font-size: 11px; color: #D4AA4A; margin-top: 8px; padding: 6px 10px; background: rgba(212,170,74,.08); border: 1px solid rgba(212,170,74,.2); border-radius: 4px; }
+  .comm-total { font-size: 13px; margin-top: 6px; padding: 10px 14px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; }
+
   /* Recipe tab */
   .recipe-ctrl { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
   .recipe-select { padding: 8px 12px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-size: 14px; min-width: 240px; }
@@ -116,6 +126,7 @@
     <button class="tab" onclick="switchTab(event,'physical')">Physical Stats</button>
     <button class="tab" onclick="switchTab(event,'professions')">Professions</button>
     <button class="tab" onclick="switchTab(event,'recipe')">Recipe</button>
+    <button class="tab" onclick="switchTab(event,'committee')">Committee</button>
   </div>
 
   <div id="p-mental" class="panel on">
@@ -157,6 +168,10 @@
     <p class="section-label" style="margin-top:24px">All-40 Inventory Check</p>
     <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Minimum memory items to grow all 40 professions once each (independent recipes), summed against your current inventory.</p>
     <div id="all40-output"></div>
+  </div>
+
+  <div id="p-committee" class="panel">
+    <div id="committee-output"></div>
   </div>
 
   <p class="note">Memory items are finite — optimize recipes to use the minimum needed. Food is unlimited — craft as much as required. The game picks the highest qualifying tier per profession category.</p>
@@ -380,7 +395,7 @@ function renderProfessions() {
   document.getElementById('prof-list').innerHTML = html;
 }
 
-function updateMem(n, v) { mq[n] = Math.max(0, parseInt(v)||0); renderMental(); renderProfessions(); renderAll40(); }
+function updateMem(n, v) { mq[n] = Math.max(0, parseInt(v)||0); renderMental(); renderProfessions(); renderAll40(); renderCommittee(); }
 function updateFood(n, v) { fq[n] = Math.max(0, parseInt(v)||0); renderPhysical(); renderProfessions(); }
 function switchTab(ev, id) {
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
@@ -603,6 +618,129 @@ function renderAll40() {
   document.getElementById('all40-output').innerHTML = html;
 }
 
+// ── committee data & render ───────────────────────────────────────────────────
+
+const COMMITTEES = [
+  {
+    name: 'Transit & Distribution',
+    tier: 1, value: 10.9, min_age: 18,
+    description: 'Owns the arteries of orbit: lift schedules, cargo paths, docking flows.',
+    members: [
+      { profession: 'Systems Engineer',  status: 'filled', human: 'Caius R. Arden Sinclair' },
+      { profession: 'Distributor',       status: 'empty' },
+      { profession: 'Growth Specialist', status: 'empty',
+        mem_override: [{n:'Crayon',q:4},{n:"Where's Tommy",q:3}],
+        override_note: 'Uses Crayon instead of Music Notes — Music Notes adds Communication which triggers Sculptor T2 (Arts & Culture) contamination via food\'s Life Expectancy:160.' },
+      { profession: 'Guard',             status: 'empty' },
+    ]
+  }
+];
+
+function findJob(name) {
+  for (const cat of PROFESSIONS)
+    for (const job of cat.jobs)
+      if (job.n === name) return { ...job, cat: cat.cat };
+  return null;
+}
+
+function memTraitsFromItems(items) {
+  const traits = {}; TRAITS.forEach(k => traits[k] = 0);
+  items.forEach(({n, q}) => {
+    const m = MEMORIES.find(x => x.n === n);
+    if (m) TRAITS.forEach(k => { if (m.t[k]) traits[k] += m.t[k] * q; });
+  });
+  return traits;
+}
+
+function renderCommittee() {
+  const TCLS = ['t1','t2','t3','t4'];
+  let html = '';
+
+  COMMITTEES.forEach(committee => {
+    html += `<div class="comm-name">${committee.name}</div>
+      <div class="comm-meta">Tier ${committee.tier} &nbsp;·&nbsp; Value ${committee.value} &nbsp;·&nbsp; Min age ${committee.min_age} &nbsp;·&nbsp; ${committee.description}</div>`;
+
+    let totalMemItems = 0, totalFoodItems = 0;
+    const allShort = [];
+
+    committee.members.forEach(member => {
+      if (member.status === 'filled') {
+        html += `<div class="slot-filled"><span style="color:var(--green);font-size:16px">✓</span><b>${member.profession}</b><span style="color:var(--text2)">— ${member.human}</span></div>`;
+        return;
+      }
+
+      const job = findJob(member.profession);
+      if (!job) return;
+
+      const food = optimizeFoodRecipe(job.r);
+      const memItems = member.mem_override || optimizeMemoryRecipe(job.r).items;
+      const memCount = memItems.reduce((s,x) => s+x.q, 0);
+      const memTraits = memTraitsFromItems(memItems);
+      const quals = qualifyingProfessions(memTraits, food.totals);
+
+      totalMemItems += memCount;
+      totalFoodItems += food.total;
+
+      const memShort = memItems.filter(({n,q}) => q > (mq[n]||0));
+      memShort.forEach(x => allShort.push({ slot: member.profession, name: x.n, need: x.q, have: mq[x.n]||0 }));
+
+      const highestPerCat = {};
+      quals.forEach(q => { if (!highestPerCat[q.cat] || q.tier > highestPerCat[q.cat].tier) highestPerCat[q.cat] = q; });
+      const contamination = quals.filter(q => q.n !== job.n && highestPerCat[q.cat] && q.n === highestPerCat[q.cat].n && q.cat !== job.cat);
+
+      html += `<div class="slot-empty">
+        <div class="slot-hdr">
+          <span class="tier ${TCLS[job.tier-1]}">T${job.tier}</span>
+          <span class="slot-title">${job.n}</span>
+          <span style="font-size:11px;color:var(--text3)">${job.cat}</span>
+        </div>
+        <div class="recipe-cols">`;
+
+      // Food
+      html += `<div class="rcrd"><div class="rcrd-title"><span>Food</span><span class="rcrd-count">${food.total} items</span></div>`;
+      food.items.forEach(({n,q}) => {
+        const f = FOODS.find(x=>x.n===n);
+        const contrib = f ? PHYS.map((s,i) => f.s[i] ? `${s[0]}:${f.s[i]*q}` : '').filter(Boolean).join('  ') : '';
+        html += `<div class="ritem"><span class="rqty">${q}×</span><span class="rname">${n}</span><span style="font-size:11px;color:var(--text3)">${contrib}</span></div>`;
+      });
+      const nonzero = PHYS.map((s,i) => food.totals[i] ? `${s}: <b>${food.totals[i]}</b>` : '').filter(Boolean);
+      if (nonzero.length) html += `<div class="rtot">${nonzero.join(' &nbsp; ')}</div>`;
+      html += `</div>`;
+
+      // Memory
+      html += `<div class="rcrd"><div class="rcrd-title"><span>Memory</span><span class="rcrd-count">${memCount} items</span></div>`;
+      memItems.forEach(({n,q}) => {
+        const have = mq[n]||0, cls = have>=q ? 'inv-ok' : 'inv-short';
+        const m = MEMORIES.find(x=>x.n===n);
+        html += `<div class="ritem"><span class="rqty">${q}×</span><span class="rname">${n}</span><span class="rinv ${cls}">have ${have}</span><span style="flex:1"></span>${m ? traitBadges(m.t,q) : ''}</div>`;
+      });
+      html += `<div style="margin-top:8px;font-size:12px;color:${memShort.length?'var(--red)':'var(--green)'}">`;
+      html += memShort.length ? `⚠ Short: ${memShort.map(x=>`${x.n} (need ${x.q})`).join(', ')}` : '✓ Sufficient inventory';
+      html += `</div></div>`;
+
+      html += `</div>`; // close recipe-cols
+
+      if (member.override_note) html += `<div class="override-note">⚠ ${member.override_note}</div>`;
+
+      if (contamination.length) {
+        html += `<div style="margin-top:8px;font-size:12px;color:#D4AA4A">Also qualifies (game may assign instead): ${contamination.map(q=>`${q.cat} — ${q.n} T${q.tier}`).join(', ')}</div>`;
+      }
+
+      html += `</div>`; // close slot-empty
+    });
+
+    // Summary
+    html += `<div class="comm-total">
+      Total remaining: <b>${totalMemItems}</b> memory items + <b>${totalFoodItems}</b> food items
+      ${allShort.length
+        ? `&nbsp;·&nbsp; <span style="color:var(--red)">⚠ Inventory short on: ${allShort.map(x=>`${x.name} for ${x.slot} (need ${x.need}, have ${x.have})`).join('; ')}</span>`
+        : `&nbsp;·&nbsp; <span style="color:var(--green)">✓ Sufficient inventory for all slots</span>`}
+    </div>`;
+  });
+
+  document.getElementById('committee-output').innerHTML = html;
+}
+
 // ── init ──────────────────────────────────────────────────────────────────────
 
 // Populate profession dropdown
@@ -621,7 +759,7 @@ function renderAll40() {
   });
 })();
 
-renderMental(); renderPhysical(); renderProfessions(); renderAll40();
+renderMental(); renderPhysical(); renderProfessions(); renderAll40(); renderCommittee();
 </script>
 </body>
 </html>
